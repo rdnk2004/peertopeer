@@ -36,8 +36,10 @@
     <h3>Total Earnings: ${{ total_earnings }}</h3>
     <h4>My Slots & Bookings</h4>
     {% for s in slots %}
-    <p style="margin-top: 0.5rem;">{{ s.subject }} | {{ s.date }} ({{ s.start_time }} - {{ s.end_time }}) - {% if
-        s.is_booked %}<strong>Booked</strong>{% else %}Available{% endif %}</p>
+    <p style="margin-top: 0.5rem;">
+        {{ s.subject }} | {{ s.date }} ({{ s.start_time }} - {{ s.end_time }}) -
+        {% if s.is_booked %}<strong>Booked</strong>{% else %}Available{% endif %}
+    </p>
     {% empty %}
     <p>No time slots published.</p>
     {% endfor %}

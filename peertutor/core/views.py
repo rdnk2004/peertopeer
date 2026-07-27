@@ -55,24 +55,26 @@ def user_logout(request):
     return redirect('home')
 
 # 3. Role-Based Dashboard
+# 3. Role-Based Dashboard
 @login_required
 def dashboard(request):
     user = request.user
     context = {}
-    if user.role == 'student':
-        context['bookings'] = Booking.objects.filter(student=user)
+    # Check Admin / Superuser FIRST!
+    if user.role == 'admin' or user.is_superuser:
+        context['pending_tutors'] = TutorProfile.objects.filter(status='pending')
+        context['all_bookings'] = Booking.objects.all()
+        context['total_commission'] = sum(b.commission for b in Booking.objects.filter(status='completed'))
     elif user.role == 'tutor':
         profile, _ = TutorProfile.objects.get_or_create(user=user, defaults={'hourly_rate': 0})
         context['profile'] = profile
         context['slots'] = TimeSlot.objects.filter(tutor=user)
         context['bookings'] = Booking.objects.filter(slot__tutor=user)
-        # Calculate total earnings minus 10% commission
         completed = context['bookings'].filter(status='completed')
         context['total_earnings'] = sum(b.amount - b.commission for b in completed)
-    elif user.role == 'admin' or user.is_superuser:
-        context['pending_tutors'] = TutorProfile.objects.filter(status='pending')
-        context['all_bookings'] = Booking.objects.all()
-        context['total_commission'] = sum(b.commission for b in Booking.objects.filter(status='completed'))
+    else:  # Student
+        context['bookings'] = Booking.objects.filter(student=user)
+        
     return render(request, 'dashboard.html', context)
 
 # 4. Tutor Profile Submission & Admin Verification
