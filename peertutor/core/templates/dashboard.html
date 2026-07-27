@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dashboard ({{ user.role|capfirst }})</h2>
+
+{% if user.role == 'student' %}
+<div class="card">
+    <h3>My Booked Sessions</h3>
+    {% for b in bookings %}
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0;">
+        <p><strong>Subject:</strong> {{ b.slot.subject }} with {{ b.slot.tutor.username }}</p>
+        <p><strong>Date & Time:</strong> {{ b.slot.date }} ({{ b.slot.start_time }} - {{ b.slot.end_time }})</p>
+        <p><strong>Status:</strong> <span class="badge badge-pending">{{ b.status }}</span></p>
+        {% if b.status == 'pending' %}
+        <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.8rem;">Mark
+            Completed</a>
+        <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.8rem;">Cancel</a>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p>No bookings yet. Browse tutors on homepage!</p>
+    {% endfor %}
+</div>
+
+{% elif user.role == 'tutor' %}
+<div class="card">
+    <h3>Verification Status: <span class="badge badge-{{ profile.status }}">{{ profile.status|capfirst }}</span></h3>
+    {% if profile.status != 'approved' %}
+    <p style="margin-top: 0.5rem;"><a href="{% url 'apply_tutor' %}" class="btn">Update Profile & Verification Docs</a>
+    </p>
+    {% else %}
+    <p style="margin-top: 0.5rem;"><a href="{% url 'add_slot' %}" class="btn">Publish Available Time Slot</a></p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Total Earnings: ${{ total_earnings }}</h3>
+    <h4>My Slots & Bookings</h4>
+    {% for s in slots %}
+    <p style="margin-top: 0.5rem;">{{ s.subject }} | {{ s.date }} ({{ s.start_time }} - {{ s.end_time }}) - {% if
+        s.is_booked %}<strong>Booked</strong>{% else %}Available{% endif %}</p>
+    {% empty %}
+    <p>No time slots published.</p>
+    {% endfor %}
+</div>
+
+{% elif user.role == 'admin' or user.is_superuser %}
+<div class="card">
+    <h3>Platform Commission Earned: ${{ total_commission }}</h3>
+    <h4>Pending Tutor Verifications</h4>
+    {% for p in pending_tutors %}
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0;">
+        <p><strong>Tutor:</strong> {{ p.user.username }} ({{ p.user.email }})</p>
+        <p><strong>Subjects:</strong> {{ p.subjects }} | <strong>Rate:</strong> ${{ p.hourly_rate }}</p>
+        {% if p.marksheet %}<p><a href="{{ p.marksheet.url }}" target="_blank">View Marksheet</a></p>{% endif %}
+        <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.8rem;">Approve</a>
+        <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.8rem;">Reject</a>
+    </div>
+    {% empty %}
+    <p>No pending tutor verifications.</p>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 450px; margin: 2rem auto;">
+    <h2>Confirm Booking & Payment</h2>
+    <p><strong>Tutor:</strong> {{ slot.tutor.username }}</p>
+    <p><strong>Subject:</strong> {{ slot.subject }}</p>
+    <p><strong>Time:</strong> {{ slot.date }} ({{ slot.start_time }} - {{ slot.end_time }})</p>
+    <p style="font-size: 1.2rem; color: #166534; margin: 1rem 0;"><strong>Amount Due:</strong> ${{
+        slot.tutor.tutor_profile.hourly_rate }}</p>
+
+    <div style="background: #f1f5f9; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+        <p style="font-size: 0.85rem; color: #64748b;">[Test Payment Gateway Gateway active. Payment will be held in
+            escrow until session completion.]</p>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" style="width: 100%;">Pay & Book Slot</button>
+    </form>
+</div>
+{% endblock %}

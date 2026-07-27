@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h2>Tutor Application & Verification</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Subjects Taught (comma-separated)</label>
+            <input type="text" name="subjects" required>
+        </div>
+        <div class="form-group">
+            <label>Hourly Rate ($)</label>
+            <input type="number" step="0.01" name="hourly_rate" required>
+        </div>
+        <div class="form-group">
+            <label>Upload Marksheet (PDF/Image)</label>
+            <input type="file" name="marksheet" required>
+        </div>
+        <div class="form-group">
+            <label>GitHub Link</label>
+            <input type="url" name="github_link">
+        </div>
+        <div class="form-group">
+            <label>Project Showcase Description</label>
+            <textarea name="project_showcase" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn">Submit for Verification</button>
+    </form>
+</div>
+{% endblock %}
