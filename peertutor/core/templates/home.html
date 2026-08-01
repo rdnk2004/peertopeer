@@ -21,6 +21,8 @@
         <h4>{{ tutor.user.username }}</h4>
         <p><strong>Subjects:</strong> {{ tutor.subjects }}</p>
         <p><strong>Rate:</strong> ${{ tutor.hourly_rate }}/hr</p>
+        <p><strong>Rating:</strong> ⭐ {% if tutor.avg_rating %}{{ tutor.avg_rating|floatformat:1 }}/5{% else %}No
+            ratings yet{% endif %}</p>
         {% if tutor.github_link %}
         <p><a href="{{ tutor.github_link }}" target="_blank">GitHub Profile</a></p>
         {% endif %}

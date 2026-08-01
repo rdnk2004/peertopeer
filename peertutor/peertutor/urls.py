@@ -37,6 +37,7 @@ urlpatterns = [
     path('book-slot/<int:slot_id>/', views.book_slot, name='book_slot'),
     path('complete-booking/<int:booking_id>/', views.complete_booking, name='complete_booking'),
     path('cancel-booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
+    path('review/<int:booking_id>/', views.add_review, name='add_review'),
 ]
 
 if settings.DEBUG:

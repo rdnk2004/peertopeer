@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 2rem auto;">
+    <h2>Rate & Review Tutor</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Rating (1 to 5 Stars)</label>
+            <select name="rating" required>
+                <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
+                <option value="3">⭐⭐⭐ (3 - Good)</option>
+                <option value="2">⭐⭐ (2 - Fair)</option>
+                <option value="1">⭐ (1 - Poor)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Comment</label>
+            <textarea name="comment" rows="3" required placeholder="Write your review..."></textarea>
+        </div>
+        <button type="submit" class="btn">Submit Review</button>
+    </form>
+</div>
+{% endblock %}

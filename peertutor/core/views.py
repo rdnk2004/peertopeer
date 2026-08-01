@@ -6,17 +6,21 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 # pyrefly: ignore [missing-import]
 from django.db.models import Avg, Count, Q
-# pyrefly: ignore [missing-import]
+# pyrefly: ignore [missing-import] 
 from .models import User, TutorProfile, TimeSlot, Booking, Review
+# pyrefly: ignore [missing-import]
+from .payments import calculate_escrow_amount, process_tutor_payout
 
-# 1. Homepage & Search
+# 1. Homepage & Search (with Average Ratings R19)
 def home(request):
     query = request.GET.get('q', '')
     max_price = request.GET.get('price', '')
     
-    tutors = TutorProfile.objects.filter(status='approved')
+    tutors = TutorProfile.objects.filter(status='approved').annotate(
+        avg_rating=Avg('user__reviews_received__rating')
+    )
     if query:
-        tutors = tutors.filter(Q(subjects__icontains=query) | Q(user__first_name__icontains=query))
+        tutors = tutors.filter(Q(subjects__icontains=query) | Q(user__username__icontains=query))
     if max_price:
         tutors = tutors.filter(hourly_rate__lte=max_price)
         
@@ -55,12 +59,10 @@ def user_logout(request):
     return redirect('home')
 
 # 3. Role-Based Dashboard
-# 3. Role-Based Dashboard
 @login_required
 def dashboard(request):
     user = request.user
     context = {}
-    # Check Admin / Superuser FIRST!
     if user.role == 'admin' or user.is_superuser:
         context['pending_tutors'] = TutorProfile.objects.filter(status='pending')
         context['all_bookings'] = Booking.objects.all()
@@ -101,7 +103,7 @@ def verify_tutor(request, profile_id, action):
         profile.save()
     return redirect('dashboard')
 
-# 5. Slot Publishing & Booking (Escrow Payment)
+# 5. Slot Publishing & Escrow Booking
 @login_required
 def add_slot(request):
     if request.user.role == 'tutor' and request.user.tutor_profile.status == 'approved':
@@ -120,15 +122,13 @@ def add_slot(request):
 def book_slot(request, slot_id):
     slot = get_object_or_404(TimeSlot, id=slot_id, is_booked=False)
     if request.method == 'POST':
-        # Simulate payment gateway success
-        amount = slot.tutor.tutor_profile.hourly_rate
-        commission = amount * 10 / 100  # 10% platform fee
+        amount, commission = calculate_escrow_amount(slot.tutor.tutor_profile.hourly_rate)
         Booking.objects.create(
             student=request.user,
             slot=slot,
             amount=amount,
             commission=commission,
-            status='pending'  # Escrow state
+            status='pending'
         )
         slot.is_booked = True
         slot.save()
@@ -139,8 +139,7 @@ def book_slot(request, slot_id):
 def complete_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
     if request.user == booking.student or request.user == booking.slot.tutor:
-        booking.status = 'completed'  # Releases escrow payout
-        booking.save()
+        process_tutor_payout(booking)
     return redirect('dashboard')
 
 @login_required
@@ -151,3 +150,18 @@ def cancel_booking(request, booking_id):
     booking.slot.save()
     booking.save()
     return redirect('dashboard')
+
+# 6. Ratings & Reviews (R16)
+@login_required
+def add_review(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, student=request.user, status='completed')
+    if request.method == 'POST':
+        Review.objects.create(
+            booking=booking,
+            reviewer=request.user,
+            tutor=booking.slot.tutor,
+            rating=request.POST['rating'],
+            comment=request.POST['comment']
+        )
+        return redirect('dashboard')
+    return render(request, 'add_review.html', {'booking': booking})

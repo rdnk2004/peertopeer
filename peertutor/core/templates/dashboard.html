@@ -14,6 +14,8 @@
         <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.8rem;">Mark
             Completed</a>
         <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.8rem;">Cancel</a>
+        {% elif b.status == 'completed' %}
+        <a href="{% url 'add_review' b.id %}" class="btn" style="font-size: 0.8rem;">Leave Review</a>
         {% endif %}
     </div>
     {% empty %}
