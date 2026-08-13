@@ -1,21 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card" style="max-width: 450px; margin: 2rem auto;">
-    <h2>Confirm Booking & Payment</h2>
-    <p><strong>Tutor:</strong> {{ slot.tutor.username }}</p>
-    <p><strong>Subject:</strong> {{ slot.subject }}</p>
-    <p><strong>Time:</strong> {{ slot.date }} ({{ slot.start_time }} - {{ slot.end_time }})</p>
-    <p style="font-size: 1.2rem; color: #166534; margin: 1rem 0;"><strong>Amount Due:</strong> ${{
-        slot.tutor.tutor_profile.hourly_rate }}</p>
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h2 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem;">💳 Test Payment Gateway Checkout</h2>
+    
+    {% if error %}
+    <div style="background: #fef2f2; color: #991b1b; padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem; border: 1px solid #fecaca;">
+        ❌ {{ error }}
+    </div>
+    {% endif %}
 
-    <div style="background: #f1f5f9; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
-        <p style="font-size: 0.85rem; color: #64748b;">[Test Payment Gateway Gateway active. Payment will be held in
-            escrow until session completion.]</p>
+    <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+        <h4 style="color: #0f172a; margin-bottom: 0.5rem;">Session Summary</h4>
+        <p><strong>Tutor:</strong> {{ slot.tutor.username }} ({{ slot.tutor.email }})</p>
+        <p><strong>Subject:</strong> {{ slot.subject }}</p>
+        <p><strong>Date & Time:</strong> {{ slot.date }} ({{ slot.start_time }} - {{ slot.end_time }})</p>
+        
+        <div style="margin-top: 1rem; padding-top: 0.5rem; border-top: 1px dashed #cbd5e1;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #475569;">
+                <span>Session Fee:</span>
+                <span>${{ amount }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #64748b;">
+                <span>Includes Platform Commission (10%):</span>
+                <span>${{ commission }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #166534; margin-top: 0.5rem;">
+                <span>Total Due in Escrow:</span>
+                <span>${{ amount }}</span>
+            </div>
+        </div>
     </div>
 
     <form method="POST">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success" style="width: 100%;">Pay & Book Slot</button>
+        <div class="form-group">
+            <label>Test Card Number</label>
+            <input type="text" name="card_number" value="4242-4242-4242-4242" placeholder="4242 4242 4242 4242" required>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <div class="form-group" style="flex: 1;">
+                <label>Expiry (MM/YY)</label>
+                <input type="text" name="expiry" value="12/28" placeholder="12/28" required>
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>CVC</label>
+                <input type="text" name="cvc" value="123" placeholder="123" required>
+            </div>
+        </div>
+
+        <div style="background: #eff6ff; color: #1e40af; padding: 0.8rem; border-radius: 6px; margin-bottom: 1.5rem; font-size: 0.85rem;">
+            🔒 <strong>Escrow Guarantee:</strong> Payment is safely held in escrow until you mark the session completed on your dashboard.
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%; font-size: 1rem; padding: 0.8rem;">Confirm & Pay ${{ amount }}</button>
+        <a href="{% url 'tutor_detail' slot.tutor.tutor_profile.id %}" style="display: block; text-align: center; margin-top: 0.8rem; color: #64748b; text-decoration: none; font-size: 0.9rem;">Cancel</a>
     </form>
 </div>
 {% endblock %}

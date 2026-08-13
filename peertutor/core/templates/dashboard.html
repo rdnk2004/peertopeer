@@ -1,66 +1,142 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Dashboard ({{ user.role|capfirst }})</h2>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2>Welcome back, {{ user.username }}</h2>
+    <span class="badge badge-approved" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">Role: {{ user.role|capfirst }}</span>
+</div>
 
 {% if user.role == 'student' %}
 <div class="card">
-    <h3>My Booked Sessions</h3>
+    <h3>My Booked Sessions (Escrow Protected)</h3>
     {% for b in bookings %}
-    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0;">
-        <p><strong>Subject:</strong> {{ b.slot.subject }} with {{ b.slot.tutor.username }}</p>
-        <p><strong>Date & Time:</strong> {{ b.slot.date }} ({{ b.slot.start_time }} - {{ b.slot.end_time }})</p>
-        <p><strong>Status:</strong> <span class="badge badge-pending">{{ b.status }}</span></p>
-        {% if b.status == 'pending' %}
-        <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.8rem;">Mark
-            Completed</a>
-        <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.8rem;">Cancel</a>
-        {% elif b.status == 'completed' %}
-        <a href="{% url 'add_review' b.id %}" class="btn" style="font-size: 0.8rem;">Leave Review</a>
-        {% endif %}
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h4 style="font-size: 1.1rem; color: #0f172a;">{{ b.slot.subject }}</h4>
+            <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
+                👨‍🏫 Tutor: <strong><a href="{% url 'tutor_detail' b.slot.tutor.tutor_profile.id %}">{{ b.slot.tutor.username }}</a></strong> ({{ b.slot.tutor.email }})
+            </p>
+            <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.2rem;">
+                📅 Date: {{ b.slot.date }} | ⏰ Time: {{ b.slot.start_time }} - {{ b.slot.end_time }}
+            </p>
+            {% if b.transaction_id %}
+            <p style="color: #94a3b8; font-size: 0.8rem; font-family: monospace; margin-top: 0.2rem;">
+                Txn Ref: {{ b.transaction_id }} | Fee: ${{ b.amount }}
+            </p>
+            {% endif %}
+        </div>
+
+        <div style="text-align: right;">
+            <div style="margin-bottom: 0.5rem;">
+                {% if b.status == 'pending' %}
+                    <span class="badge badge-pending">Escrow Pending</span>
+                {% elif b.status == 'completed' %}
+                    <span class="badge badge-approved">Completed</span>
+                {% else %}
+                    <span class="badge" style="background: #fecaca; color: #991b1b;">Cancelled</span>
+                {% endif %}
+            </div>
+
+            <div>
+                {% if b.status == 'pending' %}
+                <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.85rem; margin-right: 0.3rem;">Release Payout & Complete</a>
+                <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.85rem;">Cancel Session</a>
+                {% elif b.status == 'completed' %}
+                <a href="{% url 'add_review' b.id %}" class="btn" style="font-size: 0.85rem; background: #8b5cf6;">⭐ Leave Review</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
     {% empty %}
-    <p>No bookings yet. Browse tutors on homepage!</p>
+    <p style="color: #64748b; padding: 1rem 0;">No sessions booked yet. <a href="{% url 'home' %}">Find a verified tutor now!</a></p>
     {% endfor %}
 </div>
 
 {% elif user.role == 'tutor' %}
 <div class="card">
-    <h3>Verification Status: <span class="badge badge-{{ profile.status }}">{{ profile.status|capfirst }}</span></h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h3>Tutor Verification Status</h3>
+            <p style="color: #64748b; margin-top: 0.2rem;">Only verified tutors can publish sessions and receive earnings.</p>
+        </div>
+        <div>
+            <span class="badge badge-{{ profile.status }}" style="font-size: 1rem; padding: 0.4rem 0.8rem;">{{ profile.status|capfirst }}</span>
+        </div>
+    </div>
+
     {% if profile.status != 'approved' %}
-    <p style="margin-top: 0.5rem;"><a href="{% url 'apply_tutor' %}" class="btn">Update Profile & Verification Docs</a>
-    </p>
+    <div style="margin-top: 1rem; background: #fffbeb; padding: 1rem; border-radius: 6px; border: 1px solid #fef3c7;">
+        <p style="color: #92400e;">Your profile is pending admin document verification. Ensure your marksheet and subjects are submitted.</p>
+        <a href="{% url 'apply_tutor' %}" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">Update Verification Details</a>
+    </div>
     {% else %}
-    <p style="margin-top: 0.5rem;"><a href="{% url 'add_slot' %}" class="btn">Publish Available Time Slot</a></p>
+    <div style="margin-top: 1rem;">
+        <a href="{% url 'add_slot' %}" class="btn btn-success">+ Publish Available Time Slot</a>
+        <a href="{% url 'tutor_detail' profile.id %}" class="btn" style="background: #475569; margin-left: 0.5rem;">Preview My Public Profile</a>
+    </div>
     {% endif %}
 </div>
 
 <div class="card">
-    <h3>Total Earnings: ${{ total_earnings }}</h3>
-    <h4>My Slots & Bookings</h4>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Net Earnings Released: <span style="color: #166534;">${{ total_earnings }}</span></h3>
+    </div>
+
+    <h4>My Sessions & Bookings</h4>
     {% for s in slots %}
-    <p style="margin-top: 0.5rem;">
-        {{ s.subject }} | {{ s.date }} ({{ s.start_time }} - {{ s.end_time }}) -
-        {% if s.is_booked %}<strong>Booked</strong>{% else %}Available{% endif %}
-    </p>
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <strong>{{ s.subject }}</strong>
+            <div style="color: #64748b; font-size: 0.85rem;">📅 {{ s.date }} | ⏰ {{ s.start_time }} - {{ s.end_time }}</div>
+        </div>
+        <div>
+            {% if s.is_booked %}
+                <span class="badge badge-pending">Booked by Student</span>
+                {% if s.booking %}
+                    {% if s.booking.status == 'completed' %}
+                        <a href="{% url 'add_review' s.booking.id %}" class="btn" style="font-size: 0.8rem; background: #8b5cf6; margin-left: 0.5rem;">⭐ Review Student</a>
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                <span class="badge badge-approved">Available</span>
+            {% endif %}
+        </div>
+    </div>
     {% empty %}
-    <p>No time slots published.</p>
+    <p style="color: #64748b; padding: 0.5rem 0;">No time slots published yet.</p>
     {% endfor %}
 </div>
 
 {% elif user.role == 'admin' or user.is_superuser %}
 <div class="card">
-    <h3>Platform Commission Earned: ${{ total_commission }}</h3>
-    <h4>Pending Tutor Verifications</h4>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3>Admin Overview</h3>
+        <div style="background: #eff6ff; padding: 0.6rem 1rem; border-radius: 6px; color: #1e40af; font-weight: bold;">
+            Total Platform Commission (10-15%): ${{ total_commission }}
+        </div>
+    </div>
+
+    <h4 style="margin-bottom: 0.8rem;">Pending Tutor Verification Applications</h4>
     {% for p in pending_tutors %}
-    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0;">
-        <p><strong>Tutor:</strong> {{ p.user.username }} ({{ p.user.email }})</p>
-        <p><strong>Subjects:</strong> {{ p.subjects }} | <strong>Rate:</strong> ${{ p.hourly_rate }}</p>
-        {% if p.marksheet %}<p><a href="{{ p.marksheet.url }}" target="_blank">View Marksheet</a></p>{% endif %}
-        <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.8rem;">Approve</a>
-        <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.8rem;">Reject</a>
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h4 style="color: #0f172a;">{{ p.user.username }} ({{ p.user.email }})</h4>
+            <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
+                <strong>Subjects:</strong> {{ p.subjects }} | <strong>Hourly Rate:</strong> ${{ p.hourly_rate }}
+            </p>
+            {% if p.github_link %}
+            <p style="font-size: 0.85rem;"><a href="{{ p.github_link }}" target="_blank">💻 GitHub Profile</a></p>
+            {% endif %}
+            {% if p.marksheet %}
+            <p style="font-size: 0.85rem;"><a href="{{ p.marksheet.url }}" target="_blank">📄 View Submitted Marksheet</a></p>
+            {% endif %}
+        </div>
+        <div>
+            <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.85rem; margin-right: 0.3rem;">Approve Profile</a>
+            <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.85rem;">Reject</a>
+        </div>
     </div>
     {% empty %}
-    <p>No pending tutor verifications.</p>
+    <p style="color: #64748b; padding: 0.5rem 0;">No pending tutor applications awaiting verification.</p>
     {% endfor %}
 </div>
 {% endif %}

@@ -5,16 +5,16 @@ from django.contrib.auth import login, logout, authenticate
 # pyrefly: ignore [missing-import]
 from django.contrib.auth.decorators import login_required
 # pyrefly: ignore [missing-import]
+from django.db import models, transaction
 from django.db.models import Avg, Count, Q
-# pyrefly: ignore [missing-import] 
 from .models import User, TutorProfile, TimeSlot, Booking, Review
-# pyrefly: ignore [missing-import]
-from .payments import calculate_escrow_amount, process_tutor_payout
+from .payments import calculate_escrow_amount, process_tutor_payout, process_test_payment
 
-# 1. Homepage & Search (with Average Ratings R19)
+# 1. Homepage & Search (with Average Ratings R19 & Rating Filtering R9)
 def home(request):
     query = request.GET.get('q', '')
     max_price = request.GET.get('price', '')
+    min_rating = request.GET.get('rating', '')
     
     tutors = TutorProfile.objects.filter(status='approved').annotate(
         avg_rating=Avg('user__reviews_received__rating')
@@ -23,12 +23,33 @@ def home(request):
         tutors = tutors.filter(Q(subjects__icontains=query) | Q(user__username__icontains=query))
     if max_price:
         tutors = tutors.filter(hourly_rate__lte=max_price)
+    if min_rating:
+        tutors = tutors.filter(avg_rating__gte=float(min_rating))
         
     stats = {
         'active_tutors': TutorProfile.objects.filter(status='approved').count(),
         'completed_sessions': Booking.objects.filter(status='completed').count(),
     }
-    return render(request, 'home.html', {'tutors': tutors, 'stats': stats, 'query': query})
+    return render(request, 'home.html', {
+        'tutors': tutors,
+        'stats': stats,
+        'query': query,
+        'max_price': max_price,
+        'min_rating': min_rating
+    })
+
+def tutor_detail(request, tutor_id):
+    tutor_profile = get_object_or_404(TutorProfile, id=tutor_id, status='approved')
+    tutor_user = tutor_profile.user
+    available_slots = TimeSlot.objects.filter(tutor=tutor_user, is_booked=False)
+    reviews = Review.objects.filter(tutor=tutor_user).select_related('reviewer')
+    
+    context = {
+        'profile': tutor_profile,
+        'available_slots': available_slots,
+        'reviews': reviews,
+    }
+    return render(request, 'tutor_detail.html', context)
 
 # 2. Registration & Authentication
 def register(request):
@@ -120,20 +141,53 @@ def add_slot(request):
 
 @login_required
 def book_slot(request, slot_id):
-    slot = get_object_or_404(TimeSlot, id=slot_id, is_booked=False)
+    slot = get_object_or_404(TimeSlot, id=slot_id)
+    amount, commission = calculate_escrow_amount(slot.tutor.tutor_profile.hourly_rate)
+    
+    if slot.is_booked:
+        return render(request, 'book_slot.html', {'slot': slot, 'error': 'This time slot has already been booked.'})
+
     if request.method == 'POST':
-        amount, commission = calculate_escrow_amount(slot.tutor.tutor_profile.hourly_rate)
-        Booking.objects.create(
-            student=request.user,
-            slot=slot,
-            amount=amount,
-            commission=commission,
-            status='pending'
-        )
-        slot.is_booked = True
-        slot.save()
+        card_number = request.POST.get('card_number', '')
+        expiry = request.POST.get('expiry', '')
+        cvc = request.POST.get('cvc', '')
+
+        success, result = process_test_payment(card_number, expiry, cvc, amount)
+        if not success:
+            return render(request, 'book_slot.html', {
+                'slot': slot,
+                'amount': amount,
+                'commission': commission,
+                'error': result
+            })
+
+        # Atomic transaction + select_for_update to prevent double booking race conditions (R14)
+        with transaction.atomic():
+            locked_slot = TimeSlot.objects.select_for_update().get(id=slot_id)
+            if locked_slot.is_booked:
+                return render(request, 'book_slot.html', {
+                    'slot': slot,
+                    'error': 'Double-booking prevented: Another student claimed this slot just moments ago.'
+                })
+            
+            Booking.objects.create(
+                student=request.user,
+                slot=locked_slot,
+                amount=amount,
+                commission=commission,
+                transaction_id=result,
+                status='pending'
+            )
+            locked_slot.is_booked = True
+            locked_slot.save()
+
         return redirect('dashboard')
-    return render(request, 'book_slot.html', {'slot': slot})
+
+    return render(request, 'book_slot.html', {
+        'slot': slot,
+        'amount': amount,
+        'commission': commission
+    })
 
 @login_required
 def complete_booking(request, booking_id):
@@ -151,17 +205,35 @@ def cancel_booking(request, booking_id):
     booking.save()
     return redirect('dashboard')
 
-# 6. Ratings & Reviews (R16)
+# 6. Mutual Ratings & Reviews (R16)
 @login_required
 def add_review(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id, student=request.user, status='completed')
+    booking = get_object_or_404(Booking, id=booking_id, status='completed')
+    
+    if request.user == booking.student:
+        target_user = booking.slot.tutor
+        role_label = "Tutor"
+    elif request.user == booking.slot.tutor:
+        target_user = booking.student
+        role_label = "Student"
+    else:
+        return redirect('dashboard')
+
+    if Review.objects.filter(booking=booking, reviewer=request.user).exists():
+        return redirect('dashboard')
+
     if request.method == 'POST':
         Review.objects.create(
             booking=booking,
             reviewer=request.user,
-            tutor=booking.slot.tutor,
+            tutor=target_user,
             rating=request.POST['rating'],
             comment=request.POST['comment']
         )
         return redirect('dashboard')
-    return render(request, 'add_review.html', {'booking': booking})
+
+    return render(request, 'add_review.html', {
+        'booking': booking,
+        'target_user': target_user,
+        'role_label': role_label
+    })

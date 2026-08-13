@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2>{{ profile.user.username }}</h2>
+            <p style="color: #64748b;">{{ profile.user.email }}</p>
+            <p style="margin-top: 0.5rem;"><strong>Subjects Taught:</strong> {{ profile.subjects }}</p>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 1.5rem; font-weight: bold; color: #2563eb;">${{ profile.hourly_rate }} / hr</div>
+            <div style="margin-top: 0.3rem;">
+                <span class="badge badge-approved">Verified Tutor</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating & Stats Overview (R19) -->
+    <div style="display: flex; gap: 2rem; background: #f1f5f9; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+        <div>
+            <span style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; font-weight: 600;">Average Rating</span>
+            <div style="font-size: 1.3rem; font-weight: bold; color: #d97706;">
+                {% if profile.average_rating %}
+                ⭐ {{ profile.average_rating }} / 5.0
+                {% else %}
+                No ratings yet
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            <span style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; font-weight: 600;">Sessions Completed</span>
+            <div style="font-size: 1.3rem; font-weight: bold; color: #0f172a;">
+                {{ profile.completed_sessions_count }} Sessions
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio & Credibility (R4) -->
+    <div style="margin-top: 1.5rem;">
+        <h4 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.4rem; margin-bottom: 0.8rem;">Credentials & Showcase</h4>
+        {% if profile.project_showcase %}
+        <p style="white-space: pre-line; color: #334155; margin-bottom: 1rem;">{{ profile.project_showcase }}</p>
+        {% else %}
+        <p style="color: #94a3b8; font-style: italic; margin-bottom: 1rem;">No project showcase provided.</p>
+        {% endif %}
+
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            {% if profile.github_link %}
+            <a href="{{ profile.github_link }}" target="_blank" class="btn" style="background: #0f172a; font-size: 0.85rem;">💻 GitHub Profile</a>
+            {% endif %}
+            {% if profile.marksheet %}
+            <a href="{{ profile.marksheet.url }}" target="_blank" class="btn" style="background: #475569; font-size: 0.85rem;">📄 View Verified Marksheet</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Published Available Slots (R8, R10) -->
+<div class="card">
+    <h3 style="margin-bottom: 1rem;">Available Time Slots</h3>
+    {% for slot in available_slots %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+        <div>
+            <strong>{{ slot.subject }}</strong>
+            <div style="color: #64748b; font-size: 0.9rem;">📅 {{ slot.date }} | ⏰ {{ slot.start_time }} - {{ slot.end_time }}</div>
+        </div>
+        <div>
+            {% if user.is_authenticated %}
+                {% if user != profile.user %}
+                <a href="{% url 'book_slot' slot.id %}" class="btn btn-success" style="font-size: 0.85rem;">Book Slot (${{ profile.hourly_rate }})</a>
+                {% else %}
+                <span style="color: #94a3b8; font-size: 0.85rem;">Your Slot</span>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'tutor_detail' profile.id %}" class="btn" style="font-size: 0.85rem;">Login to Book</a>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <p style="color: #64748b;">No open time slots available from this tutor currently.</p>
+    {% endfor %}
+</div>
+
+<!-- Student Reviews & Feedback (R16) -->
+<div class="card">
+    <h3 style="margin-bottom: 1rem;">Student Reviews</h3>
+    {% for r in reviews %}
+    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0;">
+        <div style="display: flex; justify-content: space-between;">
+            <strong>{{ r.reviewer.username }}</strong>
+            <span style="color: #f59e0b; font-weight: bold;">⭐ {{ r.rating }}/5</span>
+        </div>
+        <p style="color: #334155; margin-top: 0.4rem;">"{{ r.comment }}"</p>
+    </div>
+    {% empty %}
+    <p style="color: #64748b;">No reviews yet for this tutor.</p>
+    {% endfor %}
+</div>
+{% endblock %}

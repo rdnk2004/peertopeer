@@ -3,11 +3,28 @@
 <div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); color: white;">
     <h2>Find Verified Peer Tutors</h2>
     <p style="margin: 0.5rem 0 1.5rem; color: #94a3b8;">Learn from fellow students at affordable hourly rates.</p>
-    <form method="GET" style="display: flex; gap: 0.5rem; max-width: 600px; margin: 0 auto;">
-        <input type="text" name="q" value="{{ query }}" placeholder="Search by subject..."
-            style="flex: 1; padding: 0.6rem; border-radius: 6px; border: none;">
-        <button type="submit" class="btn">Search</button>
+
+    <!-- Search & Filter Form (R9: Subject, Rating, Price) -->
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 750px; margin: 0 auto;">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search by subject or name..."
+            style="flex: 2; min-width: 200px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+
+        <input type="number" name="price" value="{{ max_price }}" placeholder="Max $/hr" step="0.5"
+            style="flex: 1; min-width: 100px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+
+        <select name="rating" style="flex: 1; min-width: 130px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+            <option value="">Min Rating</option>
+            <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>⭐ 4.5+</option>
+            <option value="4.0" {% if min_rating == '4.0' %}selected{% endif %}>⭐ 4.0+</option>
+            <option value="3.0" {% if min_rating == '3.0' %}selected{% endif %}>⭐ 3.0+</option>
+        </select>
+
+        <button type="submit" class="btn" style="padding: 0.6rem 1.5rem;">Filter</button>
+        {% if query or max_price or min_rating %}
+        <a href="{% url 'home' %}" class="btn btn-secondary" style="padding: 0.6rem 1rem; background: #475569;">Reset</a>
+        {% endif %}
     </form>
+
     <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
         <div><strong>{{ stats.active_tutors }}</strong> Active Tutors</div>
         <div><strong>{{ stats.completed_sessions }}</strong> Completed Sessions</div>
@@ -17,21 +34,30 @@
 <h3>Available Tutors</h3>
 <div class="grid" style="margin-top: 1rem;">
     {% for tutor in tutors %}
-    <div class="card">
-        <h4>{{ tutor.user.username }}</h4>
-        <p><strong>Subjects:</strong> {{ tutor.subjects }}</p>
-        <p><strong>Rate:</strong> ${{ tutor.hourly_rate }}/hr</p>
-        <p><strong>Rating:</strong> ⭐ {% if tutor.avg_rating %}{{ tutor.avg_rating|floatformat:1 }}/5{% else %}No
-            ratings yet{% endif %}</p>
-        {% if tutor.github_link %}
-        <p><a href="{{ tutor.github_link }}" target="_blank">GitHub Profile</a></p>
-        {% endif %}
-        <div style="margin-top: 1rem;">
-            <a href="{% url 'dashboard' %}" class="btn">View & Book Slots</a>
+    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <h4 style="font-size: 1.2rem;">{{ tutor.user.username }}</h4>
+                <span class="badge badge-approved">${{ tutor.hourly_rate }}/hr</span>
+            </div>
+            <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.3rem;"><strong>Subjects:</strong> {{ tutor.subjects }}</p>
+            <p style="margin-top: 0.5rem;">
+                <strong>Rating:</strong>
+                {% if tutor.avg_rating %}
+                    <span style="color: #f59e0b; font-weight: bold;">⭐ {{ tutor.avg_rating|floatformat:1 }}</span> / 5.0
+                {% else %}
+                    <span style="color: #94a3b8; font-style: italic;">New Tutor</span>
+                {% endif %}
+            </p>
+        </div>
+        <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem;">
+            <a href="{% url 'tutor_detail' tutor.id %}" class="btn" style="width: 100%; text-align: center;">View Profile & Book Slots</a>
         </div>
     </div>
     {% empty %}
-    <p>No verified tutors available right now.</p>
+    <div class="card" style="grid-column: 1 / -1; text-align: center; color: #64748b;">
+        <p>No verified tutors match your current search/filter criteria.</p>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
