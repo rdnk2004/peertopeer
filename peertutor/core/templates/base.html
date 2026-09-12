@@ -8,103 +8,140 @@
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
         }
 
         body {
-            background-color: #f8fafc;
-            color: #1e293b;
+            background-color: #f1f5f9;
+            color: #0f172a;
             padding-bottom: 40px;
         }
 
+        /* Navigation Bar */
         nav {
             background: #0f172a;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         nav a {
-            color: #f8fafc;
+            color: #cbd5e1;
             text-decoration: none;
-            margin-left: 1rem;
+            margin-left: 1.2rem;
             font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        nav a:hover {
+            color: #ffffff;
         }
 
         .logo {
-            font-size: 1.3rem;
-            font-weight: bold;
+            font-size: 1.4rem;
+            font-weight: 700;
             color: #38bdf8 !important;
             margin: 0;
         }
 
+        /* Container & Card Layout */
         .container {
-            max-width: 1000px;
+            max-width: 960px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
 
         .card {
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.25rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Buttons */
         .btn {
             background: #2563eb;
             color: white;
             border: none;
             padding: 0.6rem 1.2rem;
             border-radius: 6px;
+            font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
         }
 
         .btn-danger {
             background: #ef4444;
         }
 
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
         .btn-success {
             background: #10b981;
         }
 
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        /* Form Inputs */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
             font-weight: 600;
+            font-size: 0.9rem;
+            color: #334155;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 0.6rem;
+            padding: 0.65rem;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
         }
 
+        /* Badges */
         .badge {
             display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         .badge-pending {
@@ -113,10 +150,16 @@
         }
 
         .badge-approved {
-            background: #bbf7d0;
+            background: #dcfce7;
             color: #166534;
         }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
     </style>
+
 </head>
 
 <body>
