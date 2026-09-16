@@ -11,21 +11,56 @@
 
 <body>
     <nav>
-        <a href="{% url 'home' %}" class="logo">PeerTutor</a>
-        <div>
+        <a href="{% url 'home' %}" class="brand-wrapper">
+            <div class="brand-icon">🎓</div>
+            <span class="logo">PeerTutor</span>
+        </a>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="nav-links" id="navMenu">
             <a href="{% url 'home' %}">Find Tutors</a>
             {% if user.is_authenticated %}
-            <a href="{% url 'dashboard' %}">Dashboard ({{ user.username }})</a>
-            <a href="{% url 'logout' %}">Logout</a>
+            <div class="nav-user-pill">
+                <span class="status-dot"></span>
+                <span>{{ user.username }}</span>
+                <span class="badge badge-neutral" style="font-size: 0.72rem; padding: 0.15rem 0.45rem;">{{ user.role|capfirst }}</span>
+            </div>
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+            <a href="{% url 'logout' %}" style="color: #f87171;">Logout</a>
             {% else %}
             <a href="{% url 'login' %}">Login</a>
-            <a href="{% url 'register' %}" class="btn">Register</a>
+            <a href="{% url 'register' %}" class="btn" style="padding: 0.45rem 1rem; font-size: 0.88rem;">Get Started</a>
             {% endif %}
         </div>
     </nav>
-    <div class="container">
+
+    <main class="container">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <p>© 2026 PeerTutor • Peer-to-Peer Micro-Tutoring Marketplace</p>
+            <div class="footer-badges">
+                <span>🛡️ Escrow Protected</span>
+                <span>⚡ Fast Discovery</span>
+                <span>🎓 Verified Tutors</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const navToggle = document.getElementById('navToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('is-open');
+            });
+        }
+    </script>
 </body>
 
 </html>
