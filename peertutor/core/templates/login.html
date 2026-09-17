@@ -2,14 +2,15 @@
 {% block content %}
 <div class="auth-card">
     <div class="auth-header">
-        <div class="auth-icon-circle">🔐</div>
+        <div class="auth-icon-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
         <h2>Welcome Back</h2>
         <p>Log in to access your sessions, bookings, and dashboard</p>
     </div>
 
     {% if error %}
     <div class="alert alert-danger">
-        <span>⚠️</span>
         <span>{{ error }}</span>
     </div>
     {% endif %}
@@ -37,7 +38,6 @@
     </div>
 
     <div class="alert alert-info" style="margin-top: 1.25rem; font-size: 0.8rem; margin-bottom: 0;">
-        <span>💡</span>
         <span><strong>Demo Accounts:</strong> admin@peertutor.com (Pass: Admin123!), alex@peertutor.com, or john@peertutor.com (Pass: Password123!)</span>
     </div>
 </div>

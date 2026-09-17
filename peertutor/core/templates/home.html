@@ -13,9 +13,9 @@
 
         <select name="rating" class="search-select">
             <option value="">Min Rating</option>
-            <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>⭐ 4.5 & up</option>
-            <option value="4.0" {% if min_rating == '4.0' %}selected{% endif %}>⭐ 4.0 & up</option>
-            <option value="3.0" {% if min_rating == '3.0' %}selected{% endif %}>⭐ 3.0 & up</option>
+            <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>4.5 & up</option>
+            <option value="4.0" {% if min_rating == '4.0' %}selected{% endif %}>4.0 & up</option>
+            <option value="3.0" {% if min_rating == '3.0' %}selected{% endif %}>3.0 & up</option>
         </select>
 
         <button type="submit" class="btn" style="padding: 0.7rem 1.4rem;">Search</button>
@@ -37,15 +37,15 @@
     <!-- Verified Marketplace Live Metrics -->
     <div class="hero-stats-row">
         <div class="hero-stat-box">
-            <span>👨‍🏫</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span><strong class="hero-stat-number">{{ stats.active_tutors }}</strong> Verified Tutors</span>
         </div>
         <div class="hero-stat-box">
-            <span>✅</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <span><strong class="hero-stat-number">{{ stats.completed_sessions }}</strong> Completed Sessions</span>
         </div>
         <div class="hero-stat-box">
-            <span>🛡️</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span><strong>100%</strong> Escrow Protected</span>
         </div>
     </div>
@@ -86,7 +86,7 @@
             <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-top: 0.5rem;">
                 <span style="color: var(--text-muted);">Rating:</span>
                 {% if tutor.avg_rating %}
-                    <span style="color: #d97706; font-weight: 700;">⭐ {{ tutor.avg_rating|floatformat:1 }}</span>
+                    <span style="color: #d97706; font-weight: 700;">{{ tutor.avg_rating|floatformat:1 }}</span>
                     <span style="color: var(--text-subtle); font-size: 0.82rem;">/ 5.0</span>
                 {% else %}
                     <span style="color: var(--text-subtle); font-style: italic; font-size: 0.85rem;">New Tutor</span>
@@ -102,7 +102,9 @@
     </div>
     {% empty %}
     <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1.5rem;">
-        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔍</div>
+        <div style="margin-bottom: 0.75rem; color: var(--text-subtle);">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
         <h3>No matching tutors found</h3>
         <p style="color: var(--text-muted); max-width: 420px; margin: 0.5rem auto 1.5rem;">
             We couldn't find any verified tutors matching your current filter criteria. Try searching with different keywords or resetting filters.

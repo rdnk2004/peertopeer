@@ -24,8 +24,10 @@
 
     <!-- Main Payment Card -->
     <div class="card">
-        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem;">
-            <div style="font-size: 1.5rem;">💳</div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+            <div style="color: var(--primary);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            </div>
             <div>
                 <h2 style="font-size: 1.4rem;">Checkout & Escrow Hold</h2>
                 <p style="color: var(--text-muted); font-size: 0.85rem;">Test payment gateway with escrow protection</p>
@@ -34,7 +36,6 @@
 
         {% if error %}
         <div class="alert alert-danger">
-            <span>❌</span>
             <span>{{ error }}</span>
         </div>
         {% endif %}
@@ -48,10 +49,10 @@
                 <strong>Topic:</strong> {{ slot.subject }}
             </p>
             <p style="font-size: 0.9rem; color: #475569; margin-top: 0.2rem;">
-                👨‍🏫 <strong>Tutor:</strong> {{ slot.tutor.username }} ({{ slot.tutor.email }})
+                <strong>Tutor:</strong> {{ slot.tutor.username }} ({{ slot.tutor.email }})
             </p>
             <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.2rem;">
-                📅 <strong>Date:</strong> {{ slot.date }} &nbsp;|&nbsp; ⏰ {{ slot.start_time }} – {{ slot.end_time }}
+                <strong>Date:</strong> {{ slot.date }} &nbsp;|&nbsp; <strong>Time:</strong> {{ slot.start_time }} – {{ slot.end_time }}
             </p>
 
             <div style="margin-top: 1rem; padding-top: 0.85rem; border-top: 1px dashed var(--border-subtle);">
@@ -90,7 +91,6 @@
             </div>
 
             <div class="alert alert-info" style="font-size: 0.82rem; margin-bottom: 1.5rem;">
-                <span>🔒</span>
                 <span><strong>Escrow Guarantee:</strong> Payment is safely held in escrow. Funds are only released to the tutor after you mark the session completed on your dashboard.</span>
             </div>
 

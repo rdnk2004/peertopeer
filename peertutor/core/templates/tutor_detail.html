@@ -10,10 +10,10 @@
             <div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <h2>{{ profile.user.username }}</h2>
-                    <span class="badge badge-approved">✓ Verified Tutor</span>
+                    <span class="badge badge-approved">Verified Tutor</span>
                 </div>
                 <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.15rem;">
-                    📧 {{ profile.user.email }}
+                    {{ profile.user.email }}
                 </p>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <span class="profile-stat-label">Average Student Rating</span>
             <div class="profile-stat-value" style="color: #d97706;">
                 {% if profile.average_rating %}
-                ⭐ {{ profile.average_rating }} <span style="font-size: 0.9rem; color: var(--text-subtle); font-weight: 600;">/ 5.0</span>
+                {{ profile.average_rating }} <span style="font-size: 0.9rem; color: var(--text-subtle); font-weight: 600;">/ 5.0</span>
                 {% else %}
                 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 600;">No ratings yet</span>
                 {% endif %}
@@ -70,12 +70,12 @@
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             {% if profile.github_link %}
             <a href="{{ profile.github_link }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.88rem;">
-                💻 GitHub Profile
+                GitHub Profile
             </a>
             {% endif %}
             {% if profile.marksheet %}
             <a href="{{ profile.marksheet.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="font-size: 0.88rem;">
-                📄 View Verified Marksheet
+                View Verified Marksheet
             </a>
             {% endif %}
         </div>
@@ -94,7 +94,7 @@
         <div>
             <strong style="font-size: 1rem; color: var(--text-main);">{{ slot.subject }}</strong>
             <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">
-                📅 {{ slot.date }} &nbsp;|&nbsp; ⏰ {{ slot.start_time }} – {{ slot.end_time }}
+                Date: {{ slot.date }} &nbsp;|&nbsp; Time: {{ slot.start_time }} – {{ slot.end_time }}
             </div>
         </div>
         <div>
@@ -137,7 +137,7 @@
                     <div style="font-size: 0.78rem; color: var(--text-subtle);">Verified Student</div>
                 </div>
             </div>
-            <span style="color: #d97706; font-weight: 700; font-size: 0.95rem;">⭐ {{ r.rating }}/5</span>
+            <span style="color: #d97706; font-weight: 700; font-size: 0.95rem;">Rating: {{ r.rating }}/5</span>
         </div>
         <p style="color: #334155; margin-top: 0.6rem; font-size: 0.92rem; line-height: 1.5; padding-left: 2.6rem;">
             "{{ r.comment }}"

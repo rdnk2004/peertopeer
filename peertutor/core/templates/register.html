@@ -2,7 +2,9 @@
 {% block content %}
 <div class="auth-card">
     <div class="auth-header">
-        <div class="auth-icon-circle">✨</div>
+        <div class="auth-icon-circle">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </div>
         <h2>Create an Account</h2>
         <p>Join the verified peer micro-tutoring network</p>
     </div>
@@ -29,12 +31,12 @@
             <div class="role-selector-grid">
                 <label class="role-option-card">
                     <input type="radio" name="role" value="student" checked onchange="updateRoleSelection(this)">
-                    <span class="role-title">🎓 Student</span>
+                    <span class="role-title">Student</span>
                     <span class="role-desc">Book sessions & learn from peers</span>
                 </label>
                 <label class="role-option-card">
                     <input type="radio" name="role" value="tutor" onchange="updateRoleSelection(this)">
-                    <span class="role-title">👨‍🏫 Peer Tutor</span>
+                    <span class="role-title">Peer Tutor</span>
                     <span class="role-desc">Teach subjects & earn money</span>
                 </label>
             </div>

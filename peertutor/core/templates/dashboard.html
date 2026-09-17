@@ -17,21 +17,27 @@
 <!-- Student KPI Metric Cards -->
 <div class="kpi-grid">
     <div class="kpi-card">
-        <div class="kpi-icon-box">📚</div>
+        <div class="kpi-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
         <div>
             <div class="kpi-title">Booked Sessions</div>
             <div class="kpi-value">{{ bookings|length }}</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">🛡️</div>
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
         <div>
             <div class="kpi-title">Escrow Protection</div>
             <div class="kpi-value" style="color: #10b981; font-size: 1.25rem;">Active 100%</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">⭐</div>
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        </div>
         <div>
             <div class="kpi-title">Verified Platform</div>
             <div class="kpi-value" style="font-size: 1.25rem; color: #2563eb;">Peer-to-Peer</div>
@@ -52,10 +58,10 @@
                 <h4 style="font-size: 1.15rem; color: var(--text-main);">{{ b.slot.subject }}</h4>
             </div>
             <p style="color: #475569; font-size: 0.92rem; margin-top: 0.25rem;">
-                👨‍🏫 Tutor: <strong><a href="{% url 'tutor_detail' b.slot.tutor.tutor_profile.id %}" style="color: var(--primary); text-decoration: none;">{{ b.slot.tutor.username }}</a></strong> ({{ b.slot.tutor.email }})
+                Tutor: <strong><a href="{% url 'tutor_detail' b.slot.tutor.tutor_profile.id %}" style="color: var(--primary); text-decoration: none;">{{ b.slot.tutor.username }}</a></strong> ({{ b.slot.tutor.email }})
             </p>
             <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">
-                📅 Date: {{ b.slot.date }} &nbsp;|&nbsp; ⏰ Time: {{ b.slot.start_time }} – {{ b.slot.end_time }}
+                Date: {{ b.slot.date }} &nbsp;|&nbsp; Time: {{ b.slot.start_time }} – {{ b.slot.end_time }}
             </p>
             {% if b.transaction_id %}
             <p style="color: var(--text-subtle); font-size: 0.8rem; font-family: monospace; margin-top: 0.25rem;">
@@ -67,9 +73,9 @@
         <div style="text-align: right;">
             <div style="margin-bottom: 0.6rem;">
                 {% if b.status == 'pending' %}
-                    <span class="badge badge-pending">🔒 Escrow Pending</span>
+                    <span class="badge badge-pending">Escrow Pending</span>
                 {% elif b.status == 'completed' %}
-                    <span class="badge badge-approved">✓ Completed</span>
+                    <span class="badge badge-approved">Completed</span>
                 {% else %}
                     <span class="badge badge-rejected">Cancelled</span>
                 {% endif %}
@@ -85,7 +91,7 @@
                 </a>
                 {% elif b.status == 'completed' %}
                 <a href="{% url 'add_review' b.id %}" class="btn btn-purple" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
-                    ⭐ Leave Review
+                    Leave Review
                 </a>
                 {% endif %}
             </div>
@@ -103,21 +109,27 @@
 <!-- Tutor KPI Metric Cards -->
 <div class="kpi-grid">
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">💵</div>
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
         <div>
             <div class="kpi-title">Net Earnings Released</div>
             <div class="kpi-value" style="color: #10b981;">${{ total_earnings }}</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box">📅</div>
+        <div class="kpi-icon-box">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
         <div>
             <div class="kpi-title">Published Slots</div>
             <div class="kpi-value">{{ slots|length }}</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">🛡️</div>
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
         <div>
             <div class="kpi-title">Verification State</div>
             <div class="kpi-value" style="font-size: 1.25rem;">
@@ -145,7 +157,7 @@
     {% if profile.status != 'approved' %}
     <div style="margin-top: 1.25rem; background: #fffbeb; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid #fef3c7;">
         <p style="color: #92400e; font-size: 0.92rem;">
-            ⚠️ Your profile is currently awaiting document review by platform administrators. Please ensure your academic marksheet and subjects have been uploaded.
+            Your profile is currently awaiting document review by platform administrators. Please ensure your academic marksheet and subjects have been uploaded.
         </p>
         <a href="{% url 'apply_tutor' %}" class="btn" style="margin-top: 0.75rem; font-size: 0.88rem;">
             Update Verification Details →
@@ -174,7 +186,7 @@
         <div>
             <strong style="font-size: 1rem; color: var(--text-main);">{{ s.subject }}</strong>
             <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">
-                📅 {{ s.date }} &nbsp;|&nbsp; ⏰ {{ s.start_time }} – {{ s.end_time }}
+                Date: {{ s.date }} &nbsp;|&nbsp; Time: {{ s.start_time }} – {{ s.end_time }}
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -183,7 +195,7 @@
                 {% if s.booking %}
                     {% if s.booking.status == 'completed' %}
                         <a href="{% url 'add_review' s.booking.id %}" class="btn btn-purple" style="font-size: 0.82rem; padding: 0.35rem 0.7rem;">
-                            ⭐ Review Student
+                            Review Student
                         </a>
                     {% endif %}
                 {% endif %}
@@ -203,21 +215,27 @@
 <!-- Admin KPI Metric Cards -->
 <div class="kpi-grid">
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #eff6ff; color: #1e40af;">🏦</div>
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #1e40af;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
         <div>
             <div class="kpi-title">Platform Commission</div>
             <div class="kpi-value" style="color: #1e40af;">${{ total_commission }}</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #fffbeb; color: #b45309;">⏳</div>
+        <div class="kpi-icon-box" style="background: #fffbeb; color: #b45309;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
         <div>
             <div class="kpi-title">Pending Tutor Applications</div>
             <div class="kpi-value" style="color: #b45309;">{{ pending_tutors|length }}</div>
         </div>
     </div>
     <div class="kpi-card">
-        <div class="kpi-icon-box" style="background: #ecfdf5; color: #059669;">📑</div>
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #059669;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
         <div>
             <div class="kpi-title">Total Bookings</div>
             <div class="kpi-value" style="color: #059669;">{{ all_bookings|length }}</div>
@@ -238,22 +256,22 @@
             <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem; font-size: 0.85rem;">
                 {% if p.github_link %}
                 <a href="{{ p.github_link }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
-                    💻 GitHub Profile
+                    GitHub Profile
                 </a>
                 {% endif %}
                 {% if p.marksheet %}
                 <a href="{{ p.marksheet.url }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
-                    📄 View Submitted Marksheet
+                    View Submitted Marksheet
                 </a>
                 {% endif %}
             </div>
         </div>
         <div style="display: flex; gap: 0.4rem;">
             <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
-                ✓ Approve
+                Approve
             </a>
             <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
-                ✕ Reject
+                Reject
             </a>
         </div>
     </div>
