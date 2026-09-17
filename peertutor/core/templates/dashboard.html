@@ -1,142 +1,266 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-    <h2>Welcome back, {{ user.username }}</h2>
-    <span class="badge badge-approved" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">Role: {{ user.role|capfirst }}</span>
+<!-- Dashboard Welcome Header -->
+<div class="dashboard-header">
+    <div>
+        <h1 style="font-size: 1.85rem;">Dashboard Overview</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.2rem;">
+            Logged in as <strong>{{ user.username }}</strong> ({{ user.email }})
+        </p>
+    </div>
+    <span class="badge badge-approved" style="font-size: 0.88rem; padding: 0.45rem 0.9rem;">
+        Role: {{ user.role|capfirst }}
+    </span>
 </div>
 
 {% if user.role == 'student' %}
-<div class="card">
-    <h3>My Booked Sessions (Escrow Protected)</h3>
-    {% for b in bookings %}
-    <div style="border-bottom: 1px solid #e2e8f0; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+<!-- Student KPI Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon-box">📚</div>
         <div>
-            <h4 style="font-size: 1.1rem; color: #0f172a;">{{ b.slot.subject }}</h4>
-            <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
-                👨‍🏫 Tutor: <strong><a href="{% url 'tutor_detail' b.slot.tutor.tutor_profile.id %}">{{ b.slot.tutor.username }}</a></strong> ({{ b.slot.tutor.email }})
+            <div class="kpi-title">Booked Sessions</div>
+            <div class="kpi-value">{{ bookings|length }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">🛡️</div>
+        <div>
+            <div class="kpi-title">Escrow Protection</div>
+            <div class="kpi-value" style="color: #10b981; font-size: 1.25rem;">Active 100%</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">⭐</div>
+        <div>
+            <div class="kpi-title">Verified Platform</div>
+            <div class="kpi-value" style="font-size: 1.25rem; color: #2563eb;">Peer-to-Peer</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3>My Booked Sessions (Escrow Protected)</h3>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ bookings|length }} total</span>
+    </div>
+
+    {% for b in bookings %}
+    <div class="session-action-row">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <h4 style="font-size: 1.15rem; color: var(--text-main);">{{ b.slot.subject }}</h4>
+            </div>
+            <p style="color: #475569; font-size: 0.92rem; margin-top: 0.25rem;">
+                👨‍🏫 Tutor: <strong><a href="{% url 'tutor_detail' b.slot.tutor.tutor_profile.id %}" style="color: var(--primary); text-decoration: none;">{{ b.slot.tutor.username }}</a></strong> ({{ b.slot.tutor.email }})
             </p>
-            <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.2rem;">
-                📅 Date: {{ b.slot.date }} | ⏰ Time: {{ b.slot.start_time }} - {{ b.slot.end_time }}
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">
+                📅 Date: {{ b.slot.date }} &nbsp;|&nbsp; ⏰ Time: {{ b.slot.start_time }} – {{ b.slot.end_time }}
             </p>
             {% if b.transaction_id %}
-            <p style="color: #94a3b8; font-size: 0.8rem; font-family: monospace; margin-top: 0.2rem;">
-                Txn Ref: {{ b.transaction_id }} | Fee: ${{ b.amount }}
+            <p style="color: var(--text-subtle); font-size: 0.8rem; font-family: monospace; margin-top: 0.25rem;">
+                Txn Ref: {{ b.transaction_id }} &nbsp;|&nbsp; Amount: ${{ b.amount }}
             </p>
             {% endif %}
         </div>
 
         <div style="text-align: right;">
-            <div style="margin-bottom: 0.5rem;">
+            <div style="margin-bottom: 0.6rem;">
                 {% if b.status == 'pending' %}
-                    <span class="badge badge-pending">Escrow Pending</span>
+                    <span class="badge badge-pending">🔒 Escrow Pending</span>
                 {% elif b.status == 'completed' %}
-                    <span class="badge badge-approved">Completed</span>
+                    <span class="badge badge-approved">✓ Completed</span>
                 {% else %}
-                    <span class="badge" style="background: #fecaca; color: #991b1b;">Cancelled</span>
+                    <span class="badge badge-rejected">Cancelled</span>
                 {% endif %}
             </div>
 
-            <div>
+            <div style="display: flex; gap: 0.4rem; justify-content: flex-end; flex-wrap: wrap;">
                 {% if b.status == 'pending' %}
-                <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.85rem; margin-right: 0.3rem;">Release Payout & Complete</a>
-                <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.85rem;">Cancel Session</a>
+                <a href="{% url 'complete_booking' b.id %}" class="btn btn-success" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                    Release Payout & Complete
+                </a>
+                <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                    Cancel
+                </a>
                 {% elif b.status == 'completed' %}
-                <a href="{% url 'add_review' b.id %}" class="btn" style="font-size: 0.85rem; background: #8b5cf6;">⭐ Leave Review</a>
+                <a href="{% url 'add_review' b.id %}" class="btn btn-purple" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                    ⭐ Leave Review
+                </a>
                 {% endif %}
             </div>
         </div>
     </div>
     {% empty %}
-    <p style="color: #64748b; padding: 1rem 0;">No sessions booked yet. <a href="{% url 'home' %}">Find a verified tutor now!</a></p>
+    <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+        <p>No sessions booked yet.</p>
+        <a href="{% url 'home' %}" class="btn" style="margin-top: 0.75rem;">Find a Verified Tutor Now →</a>
+    </div>
     {% endfor %}
 </div>
 
 {% elif user.role == 'tutor' %}
+<!-- Tutor KPI Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #10b981;">💵</div>
+        <div>
+            <div class="kpi-title">Net Earnings Released</div>
+            <div class="kpi-value" style="color: #10b981;">${{ total_earnings }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-box">📅</div>
+        <div>
+            <div class="kpi-title">Published Slots</div>
+            <div class="kpi-value">{{ slots|length }}</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #3b82f6;">🛡️</div>
+        <div>
+            <div class="kpi-title">Verification State</div>
+            <div class="kpi-value" style="font-size: 1.25rem;">
+                <span class="badge badge-{{ profile.status }}">{{ profile.status|capfirst }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h3>Tutor Verification Status</h3>
-            <p style="color: #64748b; margin-top: 0.2rem;">Only verified tutors can publish sessions and receive earnings.</p>
+            <h3>Tutor Credentials & Verification Status</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">
+                Admin document verification is required before publishing open sessions.
+            </p>
         </div>
         <div>
-            <span class="badge badge-{{ profile.status }}" style="font-size: 1rem; padding: 0.4rem 0.8rem;">{{ profile.status|capfirst }}</span>
+            <span class="badge badge-{{ profile.status }}" style="font-size: 0.9rem; padding: 0.4rem 0.85rem;">
+                Status: {{ profile.status|capfirst }}
+            </span>
         </div>
     </div>
 
     {% if profile.status != 'approved' %}
-    <div style="margin-top: 1rem; background: #fffbeb; padding: 1rem; border-radius: 6px; border: 1px solid #fef3c7;">
-        <p style="color: #92400e;">Your profile is pending admin document verification. Ensure your marksheet and subjects are submitted.</p>
-        <a href="{% url 'apply_tutor' %}" class="btn" style="margin-top: 0.5rem; font-size: 0.85rem;">Update Verification Details</a>
+    <div style="margin-top: 1.25rem; background: #fffbeb; padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid #fef3c7;">
+        <p style="color: #92400e; font-size: 0.92rem;">
+            ⚠️ Your profile is currently awaiting document review by platform administrators. Please ensure your academic marksheet and subjects have been uploaded.
+        </p>
+        <a href="{% url 'apply_tutor' %}" class="btn" style="margin-top: 0.75rem; font-size: 0.88rem;">
+            Update Verification Details →
+        </a>
     </div>
     {% else %}
-    <div style="margin-top: 1rem;">
-        <a href="{% url 'add_slot' %}" class="btn btn-success">+ Publish Available Time Slot</a>
-        <a href="{% url 'tutor_detail' profile.id %}" class="btn" style="background: #475569; margin-left: 0.5rem;">Preview My Public Profile</a>
+    <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'add_slot' %}" class="btn btn-success">
+            + Publish Available Time Slot
+        </a>
+        <a href="{% url 'tutor_detail' profile.id %}" class="btn btn-secondary">
+            Preview My Public Profile
+        </a>
     </div>
     {% endif %}
 </div>
 
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3>Net Earnings Released: <span style="color: #166534;">${{ total_earnings }}</span></h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3>My Published Slots & Bookings</h3>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">{{ slots|length }} total</span>
     </div>
 
-    <h4>My Sessions & Bookings</h4>
     {% for s in slots %}
-    <div style="border-bottom: 1px solid #e2e8f0; padding: 0.8rem 0; display: flex; justify-content: space-between; align-items: center;">
+    <div class="session-action-row">
         <div>
-            <strong>{{ s.subject }}</strong>
-            <div style="color: #64748b; font-size: 0.85rem;">📅 {{ s.date }} | ⏰ {{ s.start_time }} - {{ s.end_time }}</div>
+            <strong style="font-size: 1rem; color: var(--text-main);">{{ s.subject }}</strong>
+            <div style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.2rem;">
+                📅 {{ s.date }} &nbsp;|&nbsp; ⏰ {{ s.start_time }} – {{ s.end_time }}
+            </div>
         </div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
             {% if s.is_booked %}
                 <span class="badge badge-pending">Booked by Student</span>
                 {% if s.booking %}
                     {% if s.booking.status == 'completed' %}
-                        <a href="{% url 'add_review' s.booking.id %}" class="btn" style="font-size: 0.8rem; background: #8b5cf6; margin-left: 0.5rem;">⭐ Review Student</a>
+                        <a href="{% url 'add_review' s.booking.id %}" class="btn btn-purple" style="font-size: 0.82rem; padding: 0.35rem 0.7rem;">
+                            ⭐ Review Student
+                        </a>
                     {% endif %}
                 {% endif %}
             {% else %}
-                <span class="badge badge-approved">Available</span>
+                <span class="badge badge-approved">Open & Available</span>
             {% endif %}
         </div>
     </div>
     {% empty %}
-    <p style="color: #64748b; padding: 0.5rem 0;">No time slots published yet.</p>
+    <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <p>No time slots published yet. Click "Publish Available Time Slot" above to offer sessions.</p>
+    </div>
     {% endfor %}
 </div>
 
 {% elif user.role == 'admin' or user.is_superuser %}
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h3>Admin Overview</h3>
-        <div style="background: #eff6ff; padding: 0.6rem 1rem; border-radius: 6px; color: #1e40af; font-weight: bold;">
-            Total Platform Commission (10-15%): ${{ total_commission }}
+<!-- Admin KPI Metric Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #eff6ff; color: #1e40af;">🏦</div>
+        <div>
+            <div class="kpi-title">Platform Commission</div>
+            <div class="kpi-value" style="color: #1e40af;">${{ total_commission }}</div>
         </div>
     </div>
-
-    <h4 style="margin-bottom: 0.8rem;">Pending Tutor Verification Applications</h4>
-    {% for p in pending_tutors %}
-    <div style="border-bottom: 1px solid #e2e8f0; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #fffbeb; color: #b45309;">⏳</div>
         <div>
-            <h4 style="color: #0f172a;">{{ p.user.username }} ({{ p.user.email }})</h4>
-            <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
-                <strong>Subjects:</strong> {{ p.subjects }} | <strong>Hourly Rate:</strong> ${{ p.hourly_rate }}
-            </p>
-            {% if p.github_link %}
-            <p style="font-size: 0.85rem;"><a href="{{ p.github_link }}" target="_blank">💻 GitHub Profile</a></p>
-            {% endif %}
-            {% if p.marksheet %}
-            <p style="font-size: 0.85rem;"><a href="{{ p.marksheet.url }}" target="_blank">📄 View Submitted Marksheet</a></p>
-            {% endif %}
+            <div class="kpi-title">Pending Tutor Applications</div>
+            <div class="kpi-value" style="color: #b45309;">{{ pending_tutors|length }}</div>
         </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon-box" style="background: #ecfdf5; color: #059669;">📑</div>
         <div>
-            <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.85rem; margin-right: 0.3rem;">Approve Profile</a>
-            <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.85rem;">Reject</a>
+            <div class="kpi-title">Total Bookings</div>
+            <div class="kpi-value" style="color: #059669;">{{ all_bookings|length }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1.25rem;">Pending Tutor Verification Applications</h3>
+
+    {% for p in pending_tutors %}
+    <div class="session-action-row">
+        <div>
+            <h4 style="color: var(--text-main); font-size: 1.1rem;">{{ p.user.username }} ({{ p.user.email }})</h4>
+            <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
+                <strong>Subjects:</strong> {{ p.subjects }} &nbsp;|&nbsp; <strong>Hourly Rate:</strong> ${{ p.hourly_rate }}/hr
+            </p>
+            <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem; font-size: 0.85rem;">
+                {% if p.github_link %}
+                <a href="{{ p.github_link }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
+                    💻 GitHub Profile
+                </a>
+                {% endif %}
+                {% if p.marksheet %}
+                <a href="{{ p.marksheet.url }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
+                    📄 View Submitted Marksheet
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        <div style="display: flex; gap: 0.4rem;">
+            <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                ✓ Approve
+            </a>
+            <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                ✕ Reject
+            </a>
         </div>
     </div>
     {% empty %}
-    <p style="color: #64748b; padding: 0.5rem 0;">No pending tutor applications awaiting verification.</p>
+    <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <p>No pending tutor applications awaiting verification.</p>
+    </div>
     {% endfor %}
 </div>
 {% endif %}
