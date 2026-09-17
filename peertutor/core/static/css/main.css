@@ -977,3 +977,32 @@ nav {
     border: 1px solid #fef3c7;
     margin-left: 0.5rem;
 }
+
+/* =========================================
+   Form Enhancements & Smooth Animations
+   ========================================= */
+input[type="file"] {
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    background: #e2e8f0;
+    border: none;
+    padding: 0.45rem 0.85rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #334155;
+    margin-right: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: #cbd5e1;
+}
+
+/* Smooth Focus & Transitions */
+a, button {
+    transition: all 0.15s ease-in-out;
+}
