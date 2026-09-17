@@ -938,3 +938,42 @@ nav {
     margin-top: 0.15rem;
     color: #e2e8f0;
 }
+
+/* =========================================
+   Interactive Star Rating Component
+   ========================================= */
+.star-rating-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.star-icon-btn {
+    font-size: 2rem;
+    cursor: pointer;
+    color: #cbd5e1;
+    transition: transform 0.12s ease, color 0.12s ease;
+    user-select: none;
+}
+
+.star-icon-btn:hover {
+    transform: scale(1.2);
+}
+
+.star-icon-btn.is-active,
+.star-icon-btn.is-hovered {
+    color: #f59e0b;
+}
+
+.rating-descriptor {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #b45309;
+    background: #fffbeb;
+    padding: 0.3rem 0.65rem;
+    border-radius: var(--radius-full);
+    border: 1px solid #fef3c7;
+    margin-left: 0.5rem;
+}

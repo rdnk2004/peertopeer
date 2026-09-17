@@ -1,30 +1,60 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-<div class="card" style="max-width: 450px; margin: 2rem auto;">
-    <h2 style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-        ⭐ Review {{ role_label }}: {{ target_user.username }}
-    </h2>
-    <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 1.5rem;">
-        Session: <strong>{{ booking.slot.subject }}</strong> on {{ booking.slot.date }}
-    </p>
+<div class="card" style="max-width: 500px; margin: 2.5rem auto;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <div style="font-size: 1.8rem;">⭐</div>
+        <div>
+            <h2>Review {{ role_label }}: {{ target_user.username }}</h2>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 0.15rem;">
+                Share transparent feedback to maintain high quality on the marketplace.
+            </p>
+        </div>
+    </div>
+
+    <!-- Session Context Pill -->
+    <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0.85rem 1rem; margin-bottom: 1.5rem; font-size: 0.88rem;">
+        <span style="color: var(--text-muted);">Completed Session:</span>
+        <strong style="color: var(--text-main);">{{ booking.slot.subject }}</strong>
+        <span style="color: var(--text-subtle);">&nbsp;•&nbsp; {{ booking.slot.date }}</span>
+    </div>
 
     <form method="POST">
         {% csrf_token %}
+        <input type="hidden" name="rating" id="ratingValue" value="5">
+
         <div class="form-group">
-            <label>Rating (1 to 5 Stars)</label>
-            <select name="rating" required style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%;">
-                <option value="5">⭐⭐⭐⭐⭐ (5 - Excellent)</option>
-                <option value="4">⭐⭐⭐⭐ (4 - Very Good)</option>
-                <option value="3">⭐⭐⭐ (3 - Good)</option>
-                <option value="2">⭐⭐ (2 - Fair)</option>
-                <option value="1">⭐ (1 - Poor)</option>
-            </select>
+            <label>Rating</label>
+            <div class="star-rating-box">
+                <span class="star-icon-btn" data-value="1">★</span>
+                <span class="star-icon-btn" data-value="2">★</span>
+                <span class="star-icon-btn" data-value="3">★</span>
+                <span class="star-icon-btn" data-value="4">★</span>
+                <span class="star-icon-btn" data-value="5">★</span>
+                <span class="rating-descriptor" id="ratingDescriptor">5 Stars - Outstanding!</span>
+            </div>
+            <small style="color: var(--text-subtle); font-size: 0.8rem;">Click a star to choose your rating.</small>
         </div>
+
         <div class="form-group">
-            <label>Feedback & Review Comment</label>
-            <textarea name="comment" rows="4" required placeholder="Share your experience working together..." style="padding: 0.6rem; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%;"></textarea>
+            <label for="id_comment">Feedback & Review Comment</label>
+            <textarea id="id_comment" name="comment" rows="4" required placeholder="How was the session? Did you solve your problems, learn effectively, and communicate well?" style="line-height: 1.5;"></textarea>
+            <small style="color: var(--text-subtle); font-size: 0.78rem; display: block; margin-top: 0.3rem;">
+                Reviews are published publicly to tutor/student profiles to help other peers.
+            </small>
         </div>
-        <button type="submit" class="btn" style="width: 100%; font-size: 1rem;">Submit {{ role_label }} Review</button>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn btn-purple" style="flex: 1; padding: 0.75rem; font-size: 0.95rem;">
+                Submit {{ role_label }} Review →
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="padding: 0.75rem 1rem;">
+                Cancel
+            </a>
+        </div>
     </form>
 </div>
+
+<script src="{% static 'js/rating.js' %}"></script>
 {% endblock %}
