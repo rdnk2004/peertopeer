@@ -1,62 +1,113 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="card" style="text-align: center; background: linear-gradient(135deg, #1e293b, #0f172a); color: white;">
-    <h2>Find Verified Peer Tutors</h2>
-    <p style="margin: 0.5rem 0 1.5rem; color: #94a3b8;">Learn from fellow students at affordable hourly rates.</p>
+<!-- Hero Section & Search Discovery -->
+<section class="hero-banner">
+    <h1 class="hero-title">Find Verified Peer Tutors</h1>
+    <p class="hero-subtitle">Connect with high-achieving classmates for personalized 1-on-1 tutoring sessions backed by secure escrow protection.</p>
 
     <!-- Search & Filter Form (R9: Subject, Rating, Price) -->
-    <form method="GET" style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 750px; margin: 0 auto;">
-        <input type="text" name="q" value="{{ query }}" placeholder="Search by subject or name..."
-            style="flex: 2; min-width: 200px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+    <form method="GET" class="search-form-container" id="searchForm">
+        <input type="text" name="q" id="searchInput" value="{{ query }}" placeholder="Search by subject (e.g. Python, Calculus) or tutor name..." class="search-input">
 
-        <input type="number" name="price" value="{{ max_price }}" placeholder="Max $/hr" step="0.5"
-            style="flex: 1; min-width: 100px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        <input type="number" name="price" value="{{ max_price }}" placeholder="Max $/hr" step="0.5" class="search-select" style="max-width: 130px;">
 
-        <select name="rating" style="flex: 1; min-width: 130px; padding: 0.6rem; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: white;">
+        <select name="rating" class="search-select">
             <option value="">Min Rating</option>
-            <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>⭐ 4.5+</option>
-            <option value="4.0" {% if min_rating == '4.0' %}selected{% endif %}>⭐ 4.0+</option>
-            <option value="3.0" {% if min_rating == '3.0' %}selected{% endif %}>⭐ 3.0+</option>
+            <option value="4.5" {% if min_rating == '4.5' %}selected{% endif %}>⭐ 4.5 & up</option>
+            <option value="4.0" {% if min_rating == '4.0' %}selected{% endif %}>⭐ 4.0 & up</option>
+            <option value="3.0" {% if min_rating == '3.0' %}selected{% endif %}>⭐ 3.0 & up</option>
         </select>
 
-        <button type="submit" class="btn" style="padding: 0.6rem 1.5rem;">Filter</button>
+        <button type="submit" class="btn" style="padding: 0.7rem 1.4rem;">Search</button>
         {% if query or max_price or min_rating %}
-        <a href="{% url 'home' %}" class="btn btn-secondary" style="padding: 0.6rem 1rem; background: #475569;">Reset</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary" style="padding: 0.7rem 1rem;">Clear</a>
         {% endif %}
     </form>
 
-    <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem;">
-        <div><strong>{{ stats.active_tutors }}</strong> Active Tutors</div>
-        <div><strong>{{ stats.completed_sessions }}</strong> Completed Sessions</div>
+    <!-- Quick Filter Subject Chips -->
+    <div class="quick-chips-wrapper">
+        <span class="quick-chips-label">Popular:</span>
+        <a href="{% url 'home' %}?q=Python" class="filter-chip">Python</a>
+        <a href="{% url 'home' %}?q=Data+Structures" class="filter-chip">Data Structures</a>
+        <a href="{% url 'home' %}?q=Calculus" class="filter-chip">Calculus</a>
+        <a href="{% url 'home' %}?q=Algorithms" class="filter-chip">Algorithms</a>
+        <a href="{% url 'home' %}?q=Web+Development" class="filter-chip">Web Development</a>
     </div>
+
+    <!-- Verified Marketplace Live Metrics -->
+    <div class="hero-stats-row">
+        <div class="hero-stat-box">
+            <span>👨‍🏫</span>
+            <span><strong class="hero-stat-number">{{ stats.active_tutors }}</strong> Verified Tutors</span>
+        </div>
+        <div class="hero-stat-box">
+            <span>✅</span>
+            <span><strong class="hero-stat-number">{{ stats.completed_sessions }}</strong> Completed Sessions</span>
+        </div>
+        <div class="hero-stat-box">
+            <span>🛡️</span>
+            <span><strong>100%</strong> Escrow Protected</span>
+        </div>
+    </div>
+</section>
+
+<!-- Available Tutors Listing -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+    <h2>Available Verified Tutors</h2>
+    <span style="color: var(--text-muted); font-size: 0.9rem;">
+        Showing {{ tutors|length }} verified tutor{{ tutors|length|pluralize }}
+    </span>
 </div>
 
-<h3>Available Tutors</h3>
-<div class="grid" style="margin-top: 1rem;">
+<div class="grid">
     {% for tutor in tutors %}
-    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div class="tutor-card">
         <div>
-            <div style="display: flex; justify-content: space-between; align-items: start;">
-                <h4 style="font-size: 1.2rem;">{{ tutor.user.username }}</h4>
-                <span class="badge badge-approved">${{ tutor.hourly_rate }}/hr</span>
+            <div class="tutor-header">
+                <div class="tutor-profile-info">
+                    <div class="tutor-avatar">{{ tutor.user.username|make_list|first|upper }}</div>
+                    <div>
+                        <div class="tutor-name">{{ tutor.user.username }}</div>
+                        <span style="font-size: 0.8rem; color: #10b981; font-weight: 600;">● Verified Tutor</span>
+                    </div>
+                </div>
+                <div class="rate-badge">${{ tutor.hourly_rate }} / hr</div>
             </div>
-            <p style="color: #64748b; font-size: 0.9rem; margin-top: 0.3rem;"><strong>Subjects:</strong> {{ tutor.subjects }}</p>
-            <p style="margin-top: 0.5rem;">
-                <strong>Rating:</strong>
+
+            <div style="margin: 0.85rem 0;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.35rem; text-transform: uppercase;">
+                    Subjects
+                </div>
+                <div>
+                    <span class="subject-badge-pill">{{ tutor.subjects }}</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-top: 0.5rem;">
+                <span style="color: var(--text-muted);">Rating:</span>
                 {% if tutor.avg_rating %}
-                    <span style="color: #f59e0b; font-weight: bold;">⭐ {{ tutor.avg_rating|floatformat:1 }}</span> / 5.0
+                    <span style="color: #d97706; font-weight: 700;">⭐ {{ tutor.avg_rating|floatformat:1 }}</span>
+                    <span style="color: var(--text-subtle); font-size: 0.82rem;">/ 5.0</span>
                 {% else %}
-                    <span style="color: #94a3b8; font-style: italic;">New Tutor</span>
+                    <span style="color: var(--text-subtle); font-style: italic; font-size: 0.85rem;">New Tutor</span>
                 {% endif %}
-            </p>
+            </div>
         </div>
-        <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem;">
-            <a href="{% url 'tutor_detail' tutor.id %}" class="btn" style="width: 100%; text-align: center;">View Profile & Book Slots</a>
+
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+            <a href="{% url 'tutor_detail' tutor.id %}" class="btn" style="width: 100%;">
+                View Profile & Book Slots →
+            </a>
         </div>
     </div>
     {% empty %}
-    <div class="card" style="grid-column: 1 / -1; text-align: center; color: #64748b;">
-        <p>No verified tutors match your current search/filter criteria.</p>
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1.5rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🔍</div>
+        <h3>No matching tutors found</h3>
+        <p style="color: var(--text-muted); max-width: 420px; margin: 0.5rem auto 1.5rem;">
+            We couldn't find any verified tutors matching your current filter criteria. Try searching with different keywords or resetting filters.
+        </p>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Reset All Filters</a>
     </div>
     {% endfor %}
 </div>
