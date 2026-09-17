@@ -853,3 +853,88 @@ nav {
 .session-action-row:last-child {
     border-bottom: none;
 }
+
+/* =========================================
+   Virtual Credit Card & Checkout Preview
+   ========================================= */
+.checkout-wrapper {
+    max-width: 520px;
+    margin: 2.5rem auto;
+}
+
+.virtual-card-preview {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem 1.75rem;
+    color: white;
+    box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.3);
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.virtual-card-preview::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    bottom: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.2), transparent 70%);
+    pointer-events: none;
+}
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.card-chip {
+    width: 38px;
+    height: 28px;
+    background: linear-gradient(135deg, #fcd34d, #f59e0b);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.card-brand-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    text-transform: uppercase;
+}
+
+.card-number-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.35rem;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.card-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.card-field-label {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-field-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 0.15rem;
+    color: #e2e8f0;
+}
