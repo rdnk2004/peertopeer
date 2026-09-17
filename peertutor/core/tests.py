@@ -35,11 +35,13 @@ class PeerTutorTestCase(TestCase):
             status='approved'
         )
 
-        # Create available time slot
+        # Create available time slot (future date)
+        from django.utils import timezone
+        import datetime
         self.slot = TimeSlot.objects.create(
             tutor=self.tutor_user,
             subject='Python',
-            date='2026-09-01',
+            date=timezone.now().date() + datetime.timedelta(days=1),
             start_time='10:00:00',
             end_time='11:00:00',
             is_booked=False

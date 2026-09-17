@@ -1,12 +1,9 @@
-# pyrefly: ignore [missing-import]
 from django.shortcuts import render, redirect, get_object_or_404
-# pyrefly: ignore [missing-import]
 from django.contrib.auth import login, logout, authenticate
-# pyrefly: ignore [missing-import]
 from django.contrib.auth.decorators import login_required
-# pyrefly: ignore [missing-import]
 from django.db import models, transaction
 from django.db.models import Avg, Count, Q
+from django.utils import timezone
 from .models import User, TutorProfile, TimeSlot, Booking, Review
 from .payments import calculate_escrow_amount, process_tutor_payout, process_test_payment
 
@@ -41,7 +38,8 @@ def home(request):
 def tutor_detail(request, tutor_id):
     tutor_profile = get_object_or_404(TutorProfile, id=tutor_id, status='approved')
     tutor_user = tutor_profile.user
-    available_slots = TimeSlot.objects.filter(tutor=tutor_user, is_booked=False)
+    today = timezone.now().date()
+    available_slots = TimeSlot.objects.filter(tutor=tutor_user, is_booked=False, date__gte=today).order_by('date', 'start_time')
     reviews = Review.objects.filter(tutor=tutor_user).select_related('reviewer')
     
     context = {
@@ -83,21 +81,29 @@ def user_logout(request):
 @login_required
 def dashboard(request):
     user = request.user
-    context = {}
-    if user.role == 'admin' or user.is_superuser:
-        context['pending_tutors'] = TutorProfile.objects.filter(status='pending')
-        context['all_bookings'] = Booking.objects.all()
-        context['total_commission'] = sum(b.commission for b in Booking.objects.filter(status='completed'))
-    elif user.role == 'tutor':
+    today = timezone.now().date()
+    context = {'today': today}
+
+    # Student Bookings: Always populated so any user who booked sessions can see them
+    context['bookings'] = Booking.objects.filter(
+        student=user,
+        slot__date__gte=today
+    ).select_related('slot', 'slot__tutor', 'slot__tutor__tutor_profile').order_by('slot__date', 'slot__start_time')
+
+    # Tutor Context:
+    if user.role == 'tutor':
         profile, _ = TutorProfile.objects.get_or_create(user=user, defaults={'hourly_rate': 0})
         context['profile'] = profile
-        context['slots'] = TimeSlot.objects.filter(tutor=user)
-        context['bookings'] = Booking.objects.filter(slot__tutor=user)
-        completed = context['bookings'].filter(status='completed')
+        context['slots'] = TimeSlot.objects.filter(tutor=user, date__gte=today).order_by('date', 'start_time')
+        completed = Booking.objects.filter(slot__tutor=user, status='completed')
         context['total_earnings'] = sum(b.amount - b.commission for b in completed)
-    else:  # Student
-        context['bookings'] = Booking.objects.filter(student=user)
-        
+
+    # Admin / Superuser Context:
+    if user.role == 'admin' or user.is_superuser:
+        context['pending_tutors'] = TutorProfile.objects.filter(status='pending')
+        context['all_bookings'] = Booking.objects.filter(slot__date__gte=today).select_related('student', 'slot', 'slot__tutor').order_by('slot__date', 'slot__start_time')
+        context['total_commission'] = sum(b.commission for b in Booking.objects.filter(status='completed'))
+
     return render(request, 'dashboard.html', context)
 
 # 4. Tutor Profile Submission & Admin Verification
@@ -129,10 +135,14 @@ def verify_tutor(request, profile_id, action):
 def add_slot(request):
     if request.user.role == 'tutor' and request.user.tutor_profile.status == 'approved':
         if request.method == 'POST':
+            slot_date = request.POST['date']
+            today = timezone.now().date()
+            if str(slot_date) < str(today):
+                return render(request, 'add_slot.html', {'error': 'Cannot create a slot in the past. Please select today or a future date.'})
             TimeSlot.objects.create(
                 tutor=request.user,
                 subject=request.POST['subject'],
-                date=request.POST['date'],
+                date=slot_date,
                 start_time=request.POST['start_time'],
                 end_time=request.POST['end_time']
             )
@@ -142,6 +152,10 @@ def add_slot(request):
 @login_required
 def book_slot(request, slot_id):
     slot = get_object_or_404(TimeSlot, id=slot_id)
+    today = timezone.now().date()
+    if slot.date < today:
+        return render(request, 'book_slot.html', {'slot': slot, 'error': 'This time slot is in the past and cannot be booked.'})
+
     amount, commission = calculate_escrow_amount(slot.tutor.tutor_profile.hourly_rate)
     
     if slot.is_booked:

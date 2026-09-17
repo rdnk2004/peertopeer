@@ -282,4 +282,85 @@
     {% endfor %}
 </div>
 {% endif %}
+
+{% if user.is_superuser and user.role != 'admin' %}
+<!-- Superuser Supplemental Admin Panel -->
+<div style="margin-top: 2.5rem; padding-top: 1.75rem; border-top: 2px dashed var(--border-subtle);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+            <h3 style="font-size: 1.25rem;">Superuser Administration Panel</h3>
+            <p style="color: var(--text-muted); font-size: 0.88rem;">Overview and tutor verification management for platform superusers.</p>
+        </div>
+        <span class="badge badge-approved" style="font-size: 0.82rem;">Admin Privileges</span>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon-box" style="background: #eff6ff; color: #1e40af;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <div>
+                <div class="kpi-title">Platform Commission</div>
+                <div class="kpi-value" style="color: #1e40af;">${{ total_commission }}</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon-box" style="background: #fffbeb; color: #b45309;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+                <div class="kpi-title">Pending Tutor Applications</div>
+                <div class="kpi-value" style="color: #b45309;">{{ pending_tutors|length }}</div>
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon-box" style="background: #ecfdf5; color: #059669;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <div>
+                <div class="kpi-title">Upcoming Bookings</div>
+                <div class="kpi-value" style="color: #059669;">{{ all_bookings|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 1.25rem;">Pending Tutor Verification Applications</h3>
+        {% for p in pending_tutors %}
+        <div class="session-action-row">
+            <div>
+                <h4 style="color: var(--text-main); font-size: 1.1rem;">{{ p.user.username }} ({{ p.user.email }})</h4>
+                <p style="color: #475569; font-size: 0.9rem; margin-top: 0.2rem;">
+                    <strong>Subjects:</strong> {{ p.subjects }} &nbsp;|&nbsp; <strong>Hourly Rate:</strong> ${{ p.hourly_rate }}/hr
+                </p>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.35rem; font-size: 0.85rem;">
+                    {% if p.github_link %}
+                    <a href="{{ p.github_link }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
+                        GitHub Profile
+                    </a>
+                    {% endif %}
+                    {% if p.marksheet %}
+                    <a href="{{ p.marksheet.url }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
+                        View Submitted Marksheet
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.4rem;">
+                <a href="{% url 'verify_tutor' p.id 'approve' %}" class="btn btn-success" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                    Approve
+                </a>
+                <a href="{% url 'verify_tutor' p.id 'reject' %}" class="btn btn-danger" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">
+                    Reject
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+            <p>No pending tutor applications awaiting verification.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}
